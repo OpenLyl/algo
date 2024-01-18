@@ -17,7 +17,7 @@
 // 12. remove =k elements
 // 13. rotate right
 // 14. get intersection
-// 15. check palinkdrome 12321
+// 15. check palinkdrome
 
 typedef struct SinglyLinkedNode {
     int data;
@@ -263,6 +263,193 @@ void test_merge_sorted_linked_list() {
     free_linked_list(c);
 }
 
+void remove_node(SinglyLinkedNode **head_ref, int value) {
+    SinglyLinkedNode *head = *head_ref;
+    if (head == NULL) return;
+
+    SinglyLinkedNode *current = head;
+    SinglyLinkedNode *prev_node = NULL;
+
+    while (current->next) {
+        SinglyLinkedNode *next_node = current->next;
+        if (current->data == value) {
+            if (prev_node == NULL) {
+                *head_ref = next_node;
+            } else {
+                prev_node->next = next_node;
+            }
+            free(current);
+        } else {
+            prev_node = current;
+        }
+        current = next_node;
+    }
+}
+
+void test_remove_elements() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+    append_node(&head, 2);
+    append_node(&head, 5);
+
+    // remove_node(&head, 1);
+    // print_linked_list(head);
+
+    remove_node(&head, 2);
+    print_linked_list(head);
+
+    free_linked_list(head);
+}
+
+SinglyLinkedNode *remove_node_ret(SinglyLinkedNode *head, int value) {
+    if (head == NULL) return head;
+
+    SinglyLinkedNode dummy;
+    dummy.next = head;
+
+    SinglyLinkedNode *current = head;
+    SinglyLinkedNode *prev_node = &dummy;
+    while (current->next) {
+        SinglyLinkedNode *next_node = current->next;
+        if (current->data == value) {
+            prev_node->next = next_node;
+            free(current);
+        } else {
+            prev_node = current;
+        }
+        current = next_node;
+    }
+
+    return dummy.next;
+}
+
+void test_remove_elements_ret() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+    append_node(&head, 2);
+    append_node(&head, 5);
+
+    SinglyLinkedNode *removed_head = remove_node_ret(head, 2);
+    print_linked_list(removed_head);
+}
+
+void rotate_right(SinglyLinkedNode **head_ref, int k) {
+    SinglyLinkedNode *head = *head_ref;
+    // 1. tail link head
+    int len = 1;
+    SinglyLinkedNode *tail = head;
+    while (tail->next) {
+        tail = tail->next;
+        len++;
+    }
+    tail->next = head;
+
+    // 2. find new head node, prev
+    SinglyLinkedNode *current = head;
+    SinglyLinkedNode *prev_node = NULL;
+    for (int i = 0; i < len - (k % len); i++) {
+        prev_node = current;
+        current = current->next;
+    }
+
+    // 3. change
+    if (current && prev_node) {
+        prev_node->next = NULL;
+        *head_ref = current;
+    }
+}
+
+void test_rotate() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+    append_node(&head, 5);
+
+    rotate_right(&head, 2);
+
+    print_linked_list(head);
+    
+    free_linked_list(head);
+}
+
+SinglyLinkedNode *get_intersection_node(SinglyLinkedNode *headA, SinglyLinkedNode *headB) {
+    if (headA == NULL || headB == NULL) return NULL;
+
+    SinglyLinkedNode *a = headA;
+    SinglyLinkedNode *b = headB;
+    while (a != b) {
+        a = (a == NULL) ? headB : a->next;
+        b = (b == NULL) ? headA : b->next;
+    }
+
+    return a;
+}
+
+void test_get_intersection() {
+    SinglyLinkedNode *common = create_node(10);
+
+    SinglyLinkedNode *headA = NULL;
+    append_node(&headA, 1);
+    headA->next = common;
+    append_node(&headA, 2);
+    append_node(&headA, 3);
+    append_node(&headA, 4);
+
+    SinglyLinkedNode *headB = NULL;
+    append_node(&headB, 1);
+    append_node(&headB, 2);
+    headB->next->next = common;
+
+    SinglyLinkedNode *intersection_node = get_intersection_node(headA, headB);
+    if (intersection_node) {
+        printf("intersection node = %d\n", intersection_node->data);
+    }
+
+    free_linked_list(headA);
+    free_linked_list(headB);
+}
+
+// 1 2 3 2 1
+int check_palindrome(SinglyLinkedNode *head) {
+    if (head == NULL) return 0;
+
+    SinglyLinkedNode *middle_node = find_middle_node(head);
+    reverse(&(middle_node->next));
+
+    SinglyLinkedNode *left = head;
+    SinglyLinkedNode *right = middle_node->next;
+    while (right->next) {
+        if (left->data != right->data) {
+            return 0;
+        }
+        left = left->next;
+        right = right->next;
+    }
+    return 1;
+}
+
+void test_palinkdrome() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 2);
+    // append_node(&head, 1);
+
+    int is_palindrome = check_palindrome(head);
+    printf("is palindrome = %d\n", is_palindrome);
+
+    free_linked_list(head);
+}
+
 int main(void) {
     printf("--- begin ---\n");
     // test_create_print_free();
@@ -271,7 +458,12 @@ int main(void) {
     // test_circle();
     // test_middle_node();
     // test_delete_last_kth();
-    test_merge_sorted_linked_list();
+    // test_merge_sorted_linked_list();
+    // test_remove_elements();
+    // test_remove_elements_ret();
+    // test_rotate();
+    // test_get_intersection();
+    test_palinkdrome();
     printf("--- end ---\n");
     return 0;
 }
