@@ -1,8 +1,5 @@
 FROM --platform=linux/arm64 debian:bullseye-slim
 
-# prepare
-RUN mkdir software
-
 # basic
 RUN apt-get update \
     && apt-get install -y file curl vim

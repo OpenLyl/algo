@@ -14,6 +14,11 @@
 // 10. delete last kth
 // 11. find middle node
 
+// 12. remove =k elements
+// 13. rotate right
+// 14. get intersection
+// 15. check palinkdrome 12321
+
 typedef struct SinglyLinkedNode {
     int data;
     struct SinglyLinkedNode *next;
@@ -63,6 +68,29 @@ void print_linked_list(SinglyLinkedNode *head) {
     }
 }
 
+void test_create_print_free() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+
+    print_linked_list(head);
+
+    free_linked_list(head);
+}
+
+void test_insert() {
+    SinglyLinkedNode *head = NULL;
+    insert_node(&head, 3);
+    insert_node(&head, 2);
+    insert_node(&head, 1);
+
+    print_linked_list(head);
+
+    free_linked_list(head);
+}
+
 void reverse(SinglyLinkedNode **head_ref) {
     SinglyLinkedNode *current = *head_ref;
     SinglyLinkedNode *prev_node = NULL;
@@ -75,6 +103,20 @@ void reverse(SinglyLinkedNode **head_ref) {
         prev_node = current;
         current = next_node;
     }
+}
+
+void test_reverse() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    print_linked_list(head);
+
+    printf("---\n");
+    reverse(&head);
+    print_linked_list(head);
+
+    free_linked_list(head);
 }
 
 int check_circle(SinglyLinkedNode *head) {
@@ -90,6 +132,21 @@ int check_circle(SinglyLinkedNode *head) {
     return 0;
 }
 
+void test_circle() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+
+    head->next->next->next->next = head;
+
+    int has_circle = check_circle(head);
+    printf("has circle = %d\n", has_circle);
+
+    free_linked_list(head);
+}
+
 SinglyLinkedNode *find_middle_node(SinglyLinkedNode *head) {
     SinglyLinkedNode *slow, *fast;
     slow = fast = head;
@@ -98,6 +155,20 @@ SinglyLinkedNode *find_middle_node(SinglyLinkedNode *head) {
         fast = fast->next->next;
     }
     return slow;
+}
+
+void test_middle_node() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+    append_node(&head, 5);
+
+    SinglyLinkedNode *middle_node = find_middle_node(head);
+    printf("middle node value = %d\n", middle_node->data);
+
+    free_linked_list(head);
 }
 
 void delete_last_kth(SinglyLinkedNode **head_ref, int k) {
@@ -126,6 +197,22 @@ void delete_last_kth(SinglyLinkedNode **head_ref, int k) {
     // 4. free
     free(slow);
 }
+
+void test_delete_last_kth() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+    append_node(&head, 5);
+    print_linked_list(head);
+
+    delete_last_kth(&head, 2);
+    print_linked_list(head);
+
+    free_linked_list(head);
+}
+
 
 // 1 3 5 | 2 4 6 -> 3 5 | 2 4 6
 void move_node(SinglyLinkedNode **dest_ref, SinglyLinkedNode **src_head_ref) {
@@ -157,87 +244,6 @@ SinglyLinkedNode *merge_sorted_linked_list(SinglyLinkedNode *a , SinglyLinkedNod
     }
 
     return result.next;
-}
-
-void test_create_print_free() {
-    SinglyLinkedNode *head = NULL;
-    append_node(&head, 1);
-    append_node(&head, 2);
-    append_node(&head, 3);
-    append_node(&head, 4);
-
-    print_linked_list(head);
-
-    free_linked_list(head);
-}
-
-void test_insert() {
-    SinglyLinkedNode *head = NULL;
-    insert_node(&head, 3);
-    insert_node(&head, 2);
-    insert_node(&head, 1);
-
-    print_linked_list(head);
-
-    free_linked_list(head);
-}
-
-void test_reverse() {
-    SinglyLinkedNode *head = NULL;
-    append_node(&head, 1);
-    append_node(&head, 2);
-    append_node(&head, 3);
-    print_linked_list(head);
-
-    printf("---\n");
-    reverse(&head);
-    print_linked_list(head);
-
-    free_linked_list(head);
-}
-
-void test_circle() {
-    SinglyLinkedNode *head = NULL;
-    append_node(&head, 1);
-    append_node(&head, 2);
-    append_node(&head, 3);
-    append_node(&head, 4);
-
-    head->next->next->next->next = head;
-
-    int has_circle = check_circle(head);
-    printf("has circle = %d\n", has_circle);
-
-    free_linked_list(head);
-}
-
-void test_middle_node() {
-    SinglyLinkedNode *head = NULL;
-    append_node(&head, 1);
-    append_node(&head, 2);
-    append_node(&head, 3);
-    append_node(&head, 4);
-    append_node(&head, 5);
-
-    SinglyLinkedNode *middle_node = find_middle_node(head);
-    printf("middle node value = %d\n", middle_node->data);
-
-    free_linked_list(head);
-}
-
-void test_delete_last_kth() {
-    SinglyLinkedNode *head = NULL;
-    append_node(&head, 1);
-    append_node(&head, 2);
-    append_node(&head, 3);
-    append_node(&head, 4);
-    append_node(&head, 5);
-    print_linked_list(head);
-
-    delete_last_kth(&head, 2);
-    print_linked_list(head);
-
-    free_linked_list(head);
 }
 
 void test_merge_sorted_linked_list() {
