@@ -50,14 +50,16 @@ void insert_node(SinglyLinkedNode **head_ref, int value) {
     *head_ref = new_node;
 }
 
-void free_linked_list(SinglyLinkedNode *head) {
-    SinglyLinkedNode *current = head;
+void free_linked_list(SinglyLinkedNode **head_ref) {
+    if (*head_ref == NULL) return;
+    SinglyLinkedNode *current = *head_ref;
     while (current) {
         SinglyLinkedNode *next_node = current->next;
         current->next = NULL;
         free(current);
         current = next_node;
     }
+    *head_ref = NULL;
 }
 
 void print_linked_list(SinglyLinkedNode *head) {
@@ -77,7 +79,7 @@ void test_create_print_free() {
 
     print_linked_list(head);
 
-    free_linked_list(head);
+    free_linked_list(&head);
 }
 
 void test_insert() {
@@ -88,7 +90,7 @@ void test_insert() {
 
     print_linked_list(head);
 
-    free_linked_list(head);
+    free_linked_list(&head);
 }
 
 void reverse(SinglyLinkedNode **head_ref) {
@@ -116,7 +118,7 @@ void test_reverse() {
     reverse(&head);
     print_linked_list(head);
 
-    free_linked_list(head);
+    free_linked_list(&head);
 }
 
 int check_circle(SinglyLinkedNode *head) {
@@ -144,7 +146,7 @@ void test_circle() {
     int has_circle = check_circle(head);
     printf("has circle = %d\n", has_circle);
 
-    free_linked_list(head);
+    free_linked_list(&head);
 }
 
 SinglyLinkedNode *find_middle_node(SinglyLinkedNode *head) {
@@ -168,7 +170,7 @@ void test_middle_node() {
     SinglyLinkedNode *middle_node = find_middle_node(head);
     printf("middle node value = %d\n", middle_node->data);
 
-    free_linked_list(head);
+    free_linked_list(&head);
 }
 
 void delete_last_kth(SinglyLinkedNode **head_ref, int k) {
@@ -210,7 +212,7 @@ void test_delete_last_kth() {
     delete_last_kth(&head, 2);
     print_linked_list(head);
 
-    free_linked_list(head);
+    free_linked_list(&head);
 }
 
 
@@ -260,7 +262,7 @@ void test_merge_sorted_linked_list() {
     SinglyLinkedNode *c = merge_sorted_linked_list(a, b);
     print_linked_list(c);
 
-    free_linked_list(c);
+    free_linked_list(&c);
 }
 
 void remove_node(SinglyLinkedNode **head_ref, int value) {
@@ -301,7 +303,7 @@ void test_remove_elements() {
     remove_node(&head, 2);
     print_linked_list(head);
 
-    free_linked_list(head);
+    free_linked_list(&head);
 }
 
 SinglyLinkedNode *remove_node_ret(SinglyLinkedNode *head, int value) {
@@ -377,7 +379,7 @@ void test_rotate() {
 
     print_linked_list(head);
     
-    free_linked_list(head);
+    free_linked_list(&head);
 }
 
 SinglyLinkedNode *get_intersection_node(SinglyLinkedNode *headA, SinglyLinkedNode *headB) {
@@ -413,8 +415,8 @@ void test_get_intersection() {
         printf("intersection node = %d\n", intersection_node->data);
     }
 
-    free_linked_list(headA);
-    free_linked_list(headB);
+    free_linked_list(&headA);
+    free_linked_list(&headB);
 }
 
 // 1 2 3 2 1
@@ -447,7 +449,7 @@ void test_palinkdrome() {
     int is_palindrome = check_palindrome(head);
     printf("is palindrome = %d\n", is_palindrome);
 
-    free_linked_list(head);
+    free_linked_list(&head);
 }
 
 int main(void) {
@@ -463,7 +465,7 @@ int main(void) {
     // test_remove_elements_ret();
     // test_rotate();
     // test_get_intersection();
-    test_palinkdrome();
+    // test_palinkdrome();
     printf("--- end ---\n");
     return 0;
 }
