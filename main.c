@@ -19,6 +19,12 @@
 // 14. get intersection
 // 15. check palinkdrome
 
+// 16. find circle first node
+// 17. reverse between
+// 18. sort linked list
+// 19. remove duplicated elements (1, 2)
+// 20. copy random linked list
+
 typedef struct SinglyLinkedNode {
     int data;
     struct SinglyLinkedNode *next;
@@ -452,6 +458,305 @@ void test_palinkdrome() {
     free_linked_list(&head);
 }
 
+SinglyLinkedNode *find_circle_first_node(SinglyLinkedNode *head) {
+    SinglyLinkedNode *slow, *fast;
+    slow = fast = head;
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) {
+            slow = head;
+            while (slow != fast) {
+                slow = slow->next;
+                fast = fast->next;
+            }
+            return slow;
+        }
+    }
+    return NULL;
+}
+
+void test_find_circle_first_node() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+    append_node(&head, 5);
+    
+    head->next->next->next->next = head->next;
+
+    SinglyLinkedNode *first_node = find_circle_first_node(head);
+    if (first_node) {
+        printf("first node = %d\n", first_node->data);
+    }
+
+    free_linked_list(&head);
+}
+
+SinglyLinkedNode *reverse_between(SinglyLinkedNode *head, int left, int right) {
+    SinglyLinkedNode dummy;
+    dummy.next = head;
+    
+    // 1. find left node
+    SinglyLinkedNode *prev_node = &dummy;
+    SinglyLinkedNode *current = head;
+    for (int i = 1; i < left; i++) {
+        prev_node = current;
+        current = current->next;
+    }
+
+    // 2. reverse
+    for (int i = 0; i < right - left; i++) {
+        SinglyLinkedNode *next_node = current->next;
+        current->next = next_node->next;
+        next_node->next = prev_node->next;
+        prev_node->next = next_node;
+    }
+    return dummy.next;
+}
+
+void test_reverse_between() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+    append_node(&head, 5);
+
+    // SinglyLinkedNode *reversed_head = reverse_between(head, 2, 4);
+    SinglyLinkedNode *reversed_head = reverse_between(head, 1, 4);
+    if (reversed_head) {
+        print_linked_list(reversed_head);
+    }
+
+    free_linked_list(&reversed_head);
+}
+
+SinglyLinkedNode *sort_linked_list(SinglyLinkedNode *head) {
+    if (head == NULL || head->next == NULL) {
+        return head;
+    }
+
+    // 1. find midle node
+    SinglyLinkedNode *middle_node = find_middle_node(head);
+    if (middle_node == NULL) {
+        return NULL;
+    }
+
+    // 2. split left right
+    SinglyLinkedNode *left = head;
+    SinglyLinkedNode *right = middle_node->next;
+    middle_node->next = NULL;
+
+    // 3. sort left right
+    SinglyLinkedNode *sorted_left = sort_linked_list(left);
+    SinglyLinkedNode *sorted_right = sort_linked_list(right);
+
+    // 4. merge linked list
+    return merge_sorted_linked_list(sorted_left, sorted_right);
+}
+
+void test_sort_linked_list() {
+    SinglyLinkedNode *head = NULL;
+    append_node(&head, 7);
+    append_node(&head, 10);
+    append_node(&head, 6);
+    append_node(&head, 4);
+    append_node(&head, 8);
+    append_node(&head, 12);
+
+    SinglyLinkedNode *sorted_head = sort_linked_list(head);
+    if (sorted_head) {
+        print_linked_list(sorted_head);
+    }
+
+    free_linked_list(&sorted_head);
+}
+
+SinglyLinkedNode *remove_duplicated_elements(SinglyLinkedNode *head) {
+    SinglyLinkedNode dummy;
+    dummy.next = head;
+
+    SinglyLinkedNode *left = &dummy;
+    while (left->next) {
+        SinglyLinkedNode *right = left->next;
+        while (right->next && right->data == right->next->data) {
+            right = right->next;
+        }
+        if (left->next == right) {
+            left = left->next;    
+        } else {
+            left->next = right->next;
+        }
+    }
+    
+    return dummy.next;
+}
+
+void test_remove_duplicated_elements() {
+    SinglyLinkedNode *head = NULL;
+    // append_node(&head, 1);
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+    append_node(&head, 4);
+    append_node(&head, 5);
+
+    SinglyLinkedNode *removed_head = remove_duplicated_elements(head);
+    if (removed_head) {
+        print_linked_list(removed_head);
+    }
+
+    free_linked_list(&removed_head);
+}
+
+SinglyLinkedNode *remove_duplicated_keep_elements(SinglyLinkedNode *head) {
+    SinglyLinkedNode dummy;
+    dummy.next = head;
+
+    SinglyLinkedNode *left = &dummy;
+    while (left->next) {
+        SinglyLinkedNode *right = left->next;
+        while (right->next && right->data == right->next->data) {
+            right = right->next;
+        }
+        left->next = right;
+        left = left->next;
+    }
+    
+    return dummy.next;
+}
+
+void test_remove_duplicated_keep_elements() {
+    SinglyLinkedNode *head = NULL;
+    // append_node(&head, 1);
+    append_node(&head, 1);
+    append_node(&head, 2);
+    append_node(&head, 2);
+    append_node(&head, 3);
+    append_node(&head, 4);
+    append_node(&head, 4);
+    append_node(&head, 5);
+
+    SinglyLinkedNode *removed_head = remove_duplicated_keep_elements(head);
+    if (removed_head) {
+        print_linked_list(removed_head);
+    }
+
+    free_linked_list(&removed_head);
+}
+
+typedef struct ListNode {
+    int data;
+    struct ListNode *next;
+    struct ListNode *random;
+} ListNode;
+
+ListNode *copy_random_linked_list(ListNode *head) {
+    // 1. get len
+    int len = 0;
+    ListNode *current = head;
+    while (current) {
+        current = current->next;
+        len++;
+    }
+
+    // 2. old_nodes[index] = node | new_nodes[index] = new_node
+    ListNode *old_nodes[len];
+    ListNode *new_nodes[len];
+    current = head;
+    int index = 0;
+    while (current) {
+        old_nodes[index] = current;
+
+        ListNode *new_node = (ListNode *)malloc(sizeof(ListNode));
+        new_node->data = current->data;
+        new_node->next = NULL;
+        new_node->random = NULL;
+        new_nodes[index] = new_node;
+        
+        current = current->next;
+        index++;
+    }
+
+    // 3. link the node
+    current = head;
+    index = 0;
+    while (current) {
+        if (current->next) {
+            int next_index = 0;
+            while (old_nodes[next_index] != current->next) {
+                next_index++;
+            }
+            new_nodes[index]->next = new_nodes[next_index];
+        }
+        
+        if (current->random) {
+            int random_index = 0;
+            while (old_nodes[random_index] != current->random) {
+                random_index++;
+            }
+            new_nodes[index]->random = new_nodes[random_index];
+        }
+
+        current = current->next;
+        index++;
+    }
+
+    return new_nodes[0];
+}
+
+void test_copy_random_linked_list() {
+    ListNode *node1 = (ListNode *)malloc(sizeof(ListNode));
+    node1->data = 1;
+
+    ListNode *node2 = (ListNode *)malloc(sizeof(ListNode));
+    node2->data = 2;
+
+    ListNode *node3 = (ListNode *)malloc(sizeof(ListNode));
+    node3->data = 3;
+
+    ListNode *node4 = (ListNode *)malloc(sizeof(ListNode));
+    node4->data = 4;
+
+    ListNode *node5 = (ListNode *)malloc(sizeof(ListNode));
+    node5->data = 5;
+
+    node1->next = node2;
+    node1->random = node5;
+
+    node2->next = node3;
+    node2->random = node4;
+
+    node3->next = node4;
+    node3->random = node1;
+
+    node4->next = node5;
+    node4->random = node2;
+    
+    node5->next = NULL;
+    node5->random = node3;
+
+    ListNode *current = node1;
+    while (current) {
+        printf("current = %d, random = %d\n", current->data, current->random->data);
+        current = current->next;
+    }
+
+    ListNode *copyed_head = copy_random_linked_list(node1);
+    if (copyed_head) {
+        printf("---\n");
+        ListNode *current = copyed_head;
+        while (current) {
+            printf("current = %d, random = %d\n", current->data, current->random->data);
+            current = current->next;
+        }
+    }
+}
+
 int main(void) {
     printf("--- begin ---\n");
     // test_create_print_free();
@@ -466,6 +771,12 @@ int main(void) {
     // test_rotate();
     // test_get_intersection();
     // test_palinkdrome();
+    // test_find_circle_first_node();
+    // test_reverse_between();
+    // test_sort_linked_list();
+    // test_remove_duplicated_elements();
+    // test_remove_duplicated_keep_elements();
+    test_copy_random_linked_list();
     printf("--- end ---\n");
     return 0;
 }
