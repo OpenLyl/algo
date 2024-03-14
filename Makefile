@@ -1,5 +1,5 @@
 target:
-	gcc -g main.c -o main
+	gcc -g stack-queue.c -o main
 
 ck:
 	valgrind --leak-check=full ./main
