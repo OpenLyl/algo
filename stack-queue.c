@@ -171,6 +171,10 @@ int linkQueueDequeue(LinkQueue *link_queue, int *value) {
     return 0;
 }
 
+int linkQueueIsEmpty(LinkQueue *link_queue) {
+    return LINK_QUEUE_IS_EMPTY(link_queue);
+}
+
 void linkQueueDump(LinkQueue *link_queue) {
     LinkQueueNode *node = link_queue->head;
     int index = 0;
@@ -224,8 +228,107 @@ void testLinkQueue() {
     linkQueueDestroy(link_queue);
 }
 
+typedef struct {
+    LinkQueue *main_queue;
+    LinkQueue *temp_queue;
+} QueueStack;
+
+QueueStack *queueStackCreate() {
+    QueueStack *queue_stack = (QueueStack *)malloc(sizeof(QueueStack));
+    if (queue_stack == NULL) {
+        return NULL;
+    }
+
+    queue_stack->main_queue = linkQueueCreate();
+    queue_stack->temp_queue = linkQueueCreate();
+
+    return queue_stack;
+}
+
+int queueStackPush(QueueStack *queue_stack, int value) {
+    int main_dequeue_value;
+    while(!LINK_QUEUE_IS_EMPTY(queue_stack->main_queue)) {
+        int res = linkQueueDequeue(queue_stack->main_queue, &main_dequeue_value);
+        if (res == 0) {
+            linkQueueEnqueue(queue_stack->temp_queue, main_dequeue_value);
+        }
+    }
+
+    int res = linkQueueEnqueue(queue_stack->main_queue, value);
+
+    int temp_dequeue_value;
+    while(!LINK_QUEUE_IS_EMPTY(queue_stack->temp_queue)) {
+        int res = linkQueueDequeue(queue_stack->temp_queue, &temp_dequeue_value);
+        if (res == 0) {
+            linkQueueEnqueue(queue_stack->main_queue, temp_dequeue_value);
+        }
+    }
+
+    return res;
+}
+
+int queueStackPop(QueueStack *queue_stack, int *value) {
+    return linkQueueDequeue(queue_stack->main_queue, value);
+}
+
+int queueStackPeek(QueueStack *queue_stack) {
+    return queue_stack->main_queue->head->data;
+}
+
+int queueStackIsEmpty(QueueStack *queue_stack) {
+    return linkQueueIsEmpty(queue_stack->main_queue);
+}
+
+void queueStackDump(QueueStack *queue_stack) {
+    linkQueueDump(queue_stack->main_queue);
+}
+
+void queueStackDestroy(QueueStack *queue_stack) {
+    linkQueueDestroy(queue_stack->main_queue);
+    linkQueueDestroy(queue_stack->temp_queue);
+    free(queue_stack);
+}
+
+void testStackUseQueue() {
+    QueueStack *queue_stack = queueStackCreate();
+    if (queue_stack == NULL) {
+        printf("queue stack create failed\n");
+        return;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        int res = queueStackPush(queue_stack, i);
+        if (res < 0) {
+            printf("queue stack push value failed\n");
+        }
+    }
+    queueStackDump(queue_stack);
+
+    int value;
+    int res = queueStackPop(queue_stack, &value);
+    if (res < 0) {
+        printf("queue stack pop failed\n");
+    } else {
+        printf("queue stack pop value = %d\n", value);
+    }
+    queueStackDump(queue_stack);  
+
+    value = queueStackPeek(queue_stack);
+    printf("queue stack top value = %d\n", value);
+
+    int is_empty = queueStackIsEmpty(queue_stack);
+    printf("queue stack is empty %d\n", is_empty);
+
+    queueStackDestroy(queue_stack);
+}
+
+void testQueueUseStack() {
+
+}
+
 int main() {
     // testLinkStack();
-    testLinkQueue();
+    // testLinkQueue();
+    testStackUseQueue();
     return 0;
 }
